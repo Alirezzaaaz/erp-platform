@@ -1,0 +1,25 @@
+# Laravel
+backend/vendor/
+backend/node_modules/
+backend/.env
+backend/storage/*.key
+backend/storage/logs/*.log
+backend/bootstrap/cache/*.php
+
+# Flutter
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.packages
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+postgres_data/
