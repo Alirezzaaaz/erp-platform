@@ -52,15 +52,14 @@ class DatabaseSeeder extends Seeder
             WarehouseSeeder::class,
             ProductSeeder::class,
             PartySeeder::class,
+            InventorySeeder::class,
+            JournalEntrySeeder::class,
         ]);
 
         $adminRole = Role::where('tenant_id', $tenant->id)->where('name', 'admin')->first();
         if ($adminRole && !$adminUser->roles()->where('role_id', $adminRole->id)->exists()) {
             $adminUser->roles()->attach($adminRole->id);
         }
-
-        // موجودی اولیه (نیاز به نقش admin و permission)
-        $this->call(InventorySeeder::class);
 
         $this->command->info('✅ پایان.');
         $this->command->line('🔑 Login: demo / admin@demo.local / password');

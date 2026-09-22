@@ -10,10 +10,8 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        $tenants = Tenant::all();
-
-        foreach ($tenants as $tenant) {
-            $this->createRolesForTenant($tenant->id);
+        foreach (Tenant::all() as $tenant) {
+            self::createRolesForTenant($tenant->id);
         }
     }
 
@@ -23,22 +21,23 @@ class RoleSeeder extends Seeder
             [
                 'name' => 'admin',
                 'display_name' => 'مدیر ارشد',
-                'description' => 'دسترسی کامل به تمام بخش‌ها و تنظیمات',
+                'description' => 'دسترسی کامل',
                 'permissions' => ['*'],
                 'is_system' => true,
             ],
             [
                 'name' => 'accountant',
                 'display_name' => 'حسابدار',
-                'description' => 'دسترسی به بخش‌های مالی، گزارش‌گیری و اسناد',
+                'description' => 'دسترسی کامل به مالی و گزارش‌ها',
                 'permissions' => [
                     'dashboard.view',
-                    'accounting.view', 'accounting.create', 'accounting.edit', 'accounting.approve',
+                    'accounting.view', 'accounting.create', 'accounting.edit', 'accounting.delete', 'accounting.approve',
                     'reports.view', 'reports.export',
                     'invoices.view', 'invoices.create', 'invoices.edit',
                     'parties.view', 'parties.create', 'parties.edit',
                     'products.view',
                     'inventory.view',
+                    'warehouses.view',
                     'warehouse_map.view',
                 ],
                 'is_system' => true,
@@ -46,7 +45,7 @@ class RoleSeeder extends Seeder
             [
                 'name' => 'warehouse_operator',
                 'display_name' => 'اپراتور انبار',
-                'description' => 'ثبت ورود و خروج کالا، انبارگردانی و مدیریت موجودی',
+                'description' => 'مدیریت انبار و موجودی',
                 'permissions' => [
                     'dashboard.view',
                     'products.view', 'products.create', 'products.edit',
@@ -60,7 +59,7 @@ class RoleSeeder extends Seeder
             [
                 'name' => 'viewer',
                 'display_name' => 'مشاهده‌گر',
-                'description' => 'فقط مشاهده و دانلود گزارش‌ها بدون امکان تغییر',
+                'description' => 'فقط مشاهده',
                 'permissions' => [
                     'dashboard.view',
                     'products.view',
