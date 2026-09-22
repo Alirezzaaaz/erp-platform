@@ -13,17 +13,22 @@ class WarehouseSeeder extends Seeder
         $tenants = Tenant::all();
 
         foreach ($tenants as $tenant) {
-            Warehouse::updateOrCreate(
-                ['tenant_id' => $tenant->id, 'code' => 'MAIN'],
-                [
-                    'tenant_id' => $tenant->id,
-                    'name' => 'انبار اصلی',
-                    'code' => 'MAIN',
-                    'address' => $tenant->address,
-                    'is_active' => true,
-                    'is_default' => true,
-                ]
-            );
+            self::createDefaultWarehouseForTenant($tenant->id, $tenant->address);
         }
+    }
+
+    public static function createDefaultWarehouseForTenant(int $tenantId, ?string $address = null): Warehouse
+    {
+        return Warehouse::updateOrCreate(
+            ['tenant_id' => $tenantId, 'code' => 'MAIN'],
+            [
+                'tenant_id' => $tenantId,
+                'name' => 'انبار اصلی',
+                'code' => 'MAIN',
+                'address' => $address,
+                'is_active' => true,
+                'is_default' => true,
+            ]
+        );
     }
 }
