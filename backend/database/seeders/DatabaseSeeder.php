@@ -14,8 +14,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->command->info('🌱 شروع بارگذاری داده‌های اولیه...');
 
-        // ۱. ساخت مستاجر نمونه
-        $this->command->info('📦 ساخت مستاجر نمونه...');
         $tenant = Tenant::firstOrCreate(
             ['subdomain' => 'demo'],
             [
@@ -29,8 +27,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // ۲. ساخت کاربر مدیر
-        $this->command->info('👤 ساخت کاربر مدیر...');
         $adminUser = User::firstOrCreate(
             ['tenant_id' => $tenant->id, 'email' => 'admin@demo.local'],
             [
@@ -43,8 +39,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // ۳. ساخت تم پیش‌فرض
-        $this->command->info('🎨 ساخت تم پیش‌فرض...');
         TenantTheme::firstOrCreate(
             ['tenant_id' => $tenant->id],
             [
@@ -57,34 +51,22 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // ۴. اجرای سایر Seederها
-        $this->command->info('🔐 ساخت نقش‌ها...');
-        $this->call(RoleSeeder::class);
+        $this->call([
+            RoleSeeder::class,
+            UnitSeeder::class,
+            AccountSeeder::class,
+            FiscalYearSeeder::class,
+            WarehouseSeeder::class,
+            ProductSeeder::class,
+            PartySeeder::class,
+        ]);
 
-        $this->command->info('📏 ساخت واحدهای اندازه‌گیری...');
-        $this->call(UnitSeeder::class);
-
-        $this->command->info('💰 ساخت کدینگ حساب‌ها...');
-        $this->call(AccountSeeder::class);
-
-        $this->command->info('📅 ساخت سال مالی...');
-        $this->call(FiscalYearSeeder::class);
-
-        $this->command->info('🏭 ساخت انبار پیش‌فرض...');
-        $this->call(WarehouseSeeder::class);
-
-        // ۵. اختصاص نقش admin به کاربر مدیر
-        $this->command->info('🔗 اختصاص نقش مدیر...');
         $adminRole = Role::where('tenant_id', $tenant->id)->where('name', 'admin')->first();
         if ($adminRole && !$adminUser->roles()->where('role_id', $adminRole->id)->exists()) {
             $adminUser->roles()->attach($adminRole->id);
         }
 
         $this->command->info('✅ همه داده‌های اولیه با موفقیت بارگذاری شدند.');
-        $this->command->newLine();
-        $this->command->info('🔑 اطلاعات ورود آزمایشی:');
-        $this->command->line('   Subdomain: demo');
-        $this->command->line('   Email:     admin@demo.local');
-        $this->command->line('   Password:  password');
+        $this->command->line('🔑 Login: demo / admin@demo.local / password');
     }
 }

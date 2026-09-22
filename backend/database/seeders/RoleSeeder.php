@@ -39,6 +39,7 @@ class RoleSeeder extends Seeder
                     'parties.view', 'parties.create', 'parties.edit',
                     'products.view',
                     'inventory.view',
+                    'warehouse_map.view',
                 ],
                 'is_system' => true,
             ],
@@ -48,8 +49,8 @@ class RoleSeeder extends Seeder
                 'description' => 'ثبت ورود و خروج کالا، انبارگردانی و مدیریت موجودی',
                 'permissions' => [
                     'dashboard.view',
-                    'inventory.view', 'inventory.create', 'inventory.edit',
                     'products.view', 'products.create', 'products.edit',
+                    'inventory.view', 'inventory.create', 'inventory.edit',
                     'warehouses.view',
                     'warehouse_map.view',
                     'invoices.view',
@@ -62,8 +63,8 @@ class RoleSeeder extends Seeder
                 'description' => 'فقط مشاهده و دانلود گزارش‌ها بدون امکان تغییر',
                 'permissions' => [
                     'dashboard.view',
-                    'inventory.view',
                     'products.view',
+                    'inventory.view',
                     'invoices.view',
                     'parties.view',
                     'accounting.view',
