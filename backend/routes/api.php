@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
-use App\Http\Controllers\Api\V1\ProductController;
+use App\Http\Controllers\Api\V1\InventoryController;
+use App\Http\Controllers\Api\V1\PartyController;
 use App\Http\Controllers\Api\V1\ProductCategoryController;
+use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\UnitController;
 use App\Http\Controllers\Api\V1\WarehouseController;
-use App\Http\Controllers\Api\V1\PartyController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -53,7 +54,7 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:warehouses.delete')->delete('/{warehouse}', [WarehouseController::class, 'destroy']);
         });
 
-        // --- اشخاص (مشتریان/تأمین‌کنندگان) ---
+        // --- اشخاص ---
         Route::prefix('parties')->group(function () {
             Route::middleware('permission:parties.view')->group(function () {
                 Route::get('/', [PartyController::class, 'index']);
@@ -81,7 +82,7 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:products.delete')->delete('/{product_category}', [ProductCategoryController::class, 'destroy']);
         });
 
-        // --- واحدهای اندازه‌گیری ---
+        // --- واحدها ---
         Route::prefix('units')->group(function () {
             Route::middleware('permission:products.view')->group(function () {
                 Route::get('/', [UnitController::class, 'index']);
@@ -95,9 +96,27 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:products.delete')->delete('/{unit}', [UnitController::class, 'destroy']);
         });
 
-        // --- حسابداری (placeholder) ---
+        // ============ 🆕 انبارداری ============
+        Route::prefix('inventory')->group(function () {
+            // موجودی
+            Route::middleware('permission:inventory.view')->group(function () {
+                Route::get('/stock', [InventoryController::class, 'stockList']);
+                Route::get('/stock/product/{productId}', [InventoryController::class, 'productStock']);
+                Route::get('/summary', [InventoryController::class, 'summary']);
+                Route::get('/transactions', [InventoryController::class, 'transactions']);
+            });
+
+            // عملیات
+            Route::middleware('permission:inventory.create')->group(function () {
+                Route::post('/stock-in', [InventoryController::class, 'stockIn']);
+                Route::post('/stock-out', [InventoryController::class, 'stockOut']);
+                Route::post('/transfer', [InventoryController::class, 'transfer']);
+                Route::post('/adjust', [InventoryController::class, 'adjust']);
+            });
+        });
+
+        // ============ سایر (placeholder) ============
         Route::middleware('permission:accounting.view')->get('/accounting/journal', fn () => response()->json(['message' => 'Sprint بعدی']));
-        Route::middleware('permission:inventory.view')->get('/inventory/stock', fn () => response()->json(['message' => 'Sprint بعدی']));
         Route::middleware('permission:invoices.view')->get('/invoices', fn () => response()->json(['message' => 'Sprint بعدی']));
         Route::middleware('permission:reports.view')->get('/reports/balance-sheet', fn () => response()->json(['message' => 'Sprint بعدی']));
 

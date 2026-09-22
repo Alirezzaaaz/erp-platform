@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->command->info('🌱 شروع بارگذاری داده‌های اولیه...');
+        $this->command->info('🌱 شروع بارگذاری...');
 
         $tenant = Tenant::firstOrCreate(
             ['subdomain' => 'demo'],
@@ -41,14 +41,7 @@ class DatabaseSeeder extends Seeder
 
         TenantTheme::firstOrCreate(
             ['tenant_id' => $tenant->id],
-            [
-                'tenant_id' => $tenant->id,
-                'primary_color' => '#1976D2',
-                'secondary_color' => '#424242',
-                'font_family' => 'Vazirmatn',
-                'border_radius' => 8,
-                'theme_mode' => 'light',
-            ]
+            ['tenant_id' => $tenant->id, 'primary_color' => '#1976D2', 'font_family' => 'Vazirmatn']
         );
 
         $this->call([
@@ -66,7 +59,10 @@ class DatabaseSeeder extends Seeder
             $adminUser->roles()->attach($adminRole->id);
         }
 
-        $this->command->info('✅ همه داده‌های اولیه با موفقیت بارگذاری شدند.');
+        // موجودی اولیه (نیاز به نقش admin و permission)
+        $this->call(InventorySeeder::class);
+
+        $this->command->info('✅ پایان.');
         $this->command->line('🔑 Login: demo / admin@demo.local / password');
     }
 }
