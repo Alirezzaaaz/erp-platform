@@ -157,6 +157,19 @@ Route::prefix('v1')->group(function () {
             Route::get('/income-statement', [ReportController::class, 'incomeStatement']);
         });
 
+
+        // ============ سامانه مودیان ============
+        Route::prefix('tax')->group(function () {
+            Route::middleware('permission:invoices.view')->group(function () {
+                Route::get('/invoices/{invoice}/status', [\App\Http\Controllers\Api\V1\TaxController::class, 'queryStatus']);
+                Route::get('/invoices/{invoice}/preview', [\App\Http\Controllers\Api\V1\TaxController::class, 'previewPayload']);
+            });
+
+            Route::middleware('permission:invoices.create')->group(function () {
+                Route::post('/invoices/{invoice}/send', [\App\Http\Controllers\Api\V1\TaxController::class, 'sendInvoice']);
+            });
+        });
+
         // نقشه انبار
         Route::middleware(['platform:windows', 'role:admin'])->prefix('warehouse-map')->group(function () {
             Route::post('/layouts', fn () => response()->json(['message' => 'Sprint بعدی']));
