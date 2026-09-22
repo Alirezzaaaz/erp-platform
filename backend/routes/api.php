@@ -170,6 +170,18 @@ Route::prefix('v1')->group(function () {
             });
         });
 
+
+        // ============ SDUI (Theme) ============
+        Route::prefix('theme')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\V1\ThemeController::class, 'show']);
+            Route::get('/version', [\App\Http\Controllers\Api\V1\ThemeController::class, 'version']);
+            Route::middleware('role:admin')->group(function () {
+                Route::put('/', [\App\Http\Controllers\Api\V1\ThemeController::class, 'update']);
+                Route::patch('/', [\App\Http\Controllers\Api\V1\ThemeController::class, 'update']);
+                Route::post('/reset', [\App\Http\Controllers\Api\V1\ThemeController::class, 'reset']);
+            });
+        });
+
         // نقشه انبار
         Route::middleware(['platform:windows', 'role:admin'])->prefix('warehouse-map')->group(function () {
             Route::post('/layouts', fn () => response()->json(['message' => 'Sprint بعدی']));

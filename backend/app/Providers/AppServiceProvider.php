@@ -19,6 +19,15 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiting();
         $this->configureGates();
+        $this->configureEvents();
+    }
+
+    protected function configureEvents(): void
+    {
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\ThemeUpdated::class,
+            \App\Listeners\ClearThemeCache::class
+        );
     }
 
     /**
