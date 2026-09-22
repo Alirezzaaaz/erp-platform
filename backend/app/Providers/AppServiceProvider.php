@@ -20,6 +20,21 @@ class AppServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
         $this->configureGates();
         $this->configureEvents();
+        $this->configureObservers();
+    }
+
+    protected function configureObservers(): void
+    {
+        $observer = \App\Observers\SyncObserver::class;
+
+        \App\Models\Product::observe($observer);
+        \App\Models\ProductCategory::observe($observer);
+        \App\Models\Unit::observe($observer);
+        \App\Models\Warehouse::observe($observer);
+        \App\Models\Party::observe($observer);
+        \App\Models\Invoice::observe($observer);
+        \App\Models\Account::observe($observer);
+        \App\Models\FiscalYear::observe($observer);
     }
 
     protected function configureEvents(): void

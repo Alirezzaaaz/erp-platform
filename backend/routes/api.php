@@ -182,6 +182,15 @@ Route::prefix('v1')->group(function () {
             });
         });
 
+
+        // ============ Sync Engine ============
+        Route::prefix('sync')->group(function () {
+            Route::post('/register', [\App\Http\Controllers\Api\V1\SyncController::class, 'register']);
+            Route::post('/pull', [\App\Http\Controllers\Api\V1\SyncController::class, 'pull']);
+            Route::post('/push', [\App\Http\Controllers\Api\V1\SyncController::class, 'push']);
+            Route::get('/status', [\App\Http\Controllers\Api\V1\SyncController::class, 'status']);
+        });
+
         // نقشه انبار
         Route::middleware(['platform:windows', 'role:admin'])->prefix('warehouse-map')->group(function () {
             Route::post('/layouts', fn () => response()->json(['message' => 'Sprint بعدی']));
