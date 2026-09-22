@@ -54,6 +54,7 @@ class DatabaseSeeder extends Seeder
             PartySeeder::class,
             InventorySeeder::class,
             JournalEntrySeeder::class,
+            InvoiceSeeder::class,
         ]);
 
         $adminRole = Role::where('tenant_id', $tenant->id)->where('name', 'admin')->first();

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AccountController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\InventoryController;
+use App\Http\Controllers\Api\V1\InvoiceController;
 use App\Http\Controllers\Api\V1\JournalEntryController;
 use App\Http\Controllers\Api\V1\PartyController;
 use App\Http\Controllers\Api\V1\ProductCategoryController;
@@ -14,13 +15,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
-    // عمومی
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:register');
 
     Route::middleware(['auth:api', 'tenant'])->group(function () {
 
-        // احراز هویت
         Route::prefix('auth')->group(function () {
             Route::get('/me', [AuthController::class, 'me']);
             Route::post('/logout', [AuthController::class, 'logout']);
@@ -70,7 +69,7 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:parties.delete')->delete('/{party}', [PartyController::class, 'destroy']);
         });
 
-        // دسته‌بندی کالاها
+        // دسته‌بندی کالا
         Route::prefix('product-categories')->group(function () {
             Route::middleware('permission:products.view')->group(function () {
                 Route::get('/', [ProductCategoryController::class, 'index']);
@@ -114,42 +113,49 @@ Route::prefix('v1')->group(function () {
             });
         });
 
-        // ============ 🆕 حسابداری ============
+        // حسابداری
         Route::prefix('accounting')->group(function () {
-            // حساب‌ها
             Route::middleware('permission:accounting.view')->group(function () {
                 Route::get('/accounts', [AccountController::class, 'index']);
                 Route::get('/accounts/{account}', [AccountController::class, 'show']);
                 Route::get('/accounts/{accountId}/ledger', [AccountController::class, 'ledger']);
-
-                // اسناد
                 Route::get('/journal-entries', [JournalEntryController::class, 'index']);
                 Route::get('/journal-entries/{journalEntry}', [JournalEntryController::class, 'show']);
             });
-
             Route::middleware('permission:accounting.create')->group(function () {
                 Route::post('/journal-entries', [JournalEntryController::class, 'store']);
                 Route::post('/journal-entries/{journalEntry}/approve', [JournalEntryController::class, 'approve']);
                 Route::post('/journal-entries/{journalEntry}/cancel', [JournalEntryController::class, 'cancel']);
             });
-
             Route::middleware('permission:accounting.edit')->group(function () {
                 Route::put('/journal-entries/{journalEntry}', [JournalEntryController::class, 'update']);
                 Route::patch('/journal-entries/{journalEntry}', [JournalEntryController::class, 'update']);
             });
-
             Route::middleware('permission:accounting.delete')->delete('/journal-entries/{journalEntry}', [JournalEntryController::class, 'destroy']);
         });
 
-        // ============ 🆕 گزارش‌ها ============
+        // ============ 🆕 فاکتورها ============
+        Route::prefix('invoices')->group(function () {
+            Route::middleware('permission:invoices.view')->group(function () {
+                Route::get('/', [InvoiceController::class, 'index']);
+                Route::get('/{invoice}', [InvoiceController::class, 'show']);
+            });
+
+            Route::middleware('permission:invoices.create')->group(function () {
+                Route::post('/', [InvoiceController::class, 'store']);
+                Route::post('/{invoice}/confirm', [InvoiceController::class, 'confirm']);
+                Route::post('/{invoice}/cancel', [InvoiceController::class, 'cancel']);
+            });
+
+            Route::middleware('permission:invoices.edit')->delete('/{invoice}', [InvoiceController::class, 'destroy']);
+        });
+
+        // گزارش‌ها
         Route::prefix('reports')->middleware('permission:reports.view')->group(function () {
             Route::get('/trial-balance', [ReportController::class, 'trialBalance']);
             Route::get('/balance-sheet', [ReportController::class, 'balanceSheet']);
             Route::get('/income-statement', [ReportController::class, 'incomeStatement']);
         });
-
-        // سایر (placeholder)
-        Route::middleware('permission:invoices.view')->get('/invoices', fn () => response()->json(['message' => 'Sprint بعدی']));
 
         // نقشه انبار
         Route::middleware(['platform:windows', 'role:admin'])->prefix('warehouse-map')->group(function () {
