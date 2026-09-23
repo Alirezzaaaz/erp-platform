@@ -43,6 +43,19 @@ class RoleSeeder extends Seeder
                 'is_system' => true,
             ],
             [
+                'name' => 'warehouse_designer',
+                'display_name' => 'طراح انبار',
+                'description' => 'دسترسی به طراحی نقشه انبار (فقط ویندوز)',
+                'permissions' => [
+                    'dashboard.view',
+                    'products.view',
+                    'inventory.view',
+                    'warehouses.view',
+                    'warehouse_map.view', 'warehouse_map.create', 'warehouse_map.edit', 'warehouse_map.delete',
+                ],
+                'is_system' => true,
+            ],
+            [
                 'name' => 'warehouse_operator',
                 'display_name' => 'اپراتور انبار',
                 'description' => 'مدیریت انبار و موجودی',

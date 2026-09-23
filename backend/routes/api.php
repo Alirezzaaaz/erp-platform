@@ -9,24 +9,32 @@ use App\Http\Controllers\Api\V1\PartyController;
 use App\Http\Controllers\Api\V1\ProductCategoryController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ReportController;
+use App\Http\Controllers\Api\V1\SyncController;
+use App\Http\Controllers\Api\V1\TaxController;
+use App\Http\Controllers\Api\V1\ThemeController;
 use App\Http\Controllers\Api\V1\UnitController;
 use App\Http\Controllers\Api\V1\WarehouseController;
+use App\Http\Controllers\Api\V1\WarehouseLayoutController;
+use App\Http\Controllers\Api\V1\WarehouseLocationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
+    // ============ عمومی ============
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::post('/auth/register', [AuthController::class, 'register'])->middleware('throttle:register');
 
+    // ============ محافظت‌شده ============
     Route::middleware(['auth:api', 'tenant'])->group(function () {
 
+        // --- احراز هویت ---
         Route::prefix('auth')->group(function () {
             Route::get('/me', [AuthController::class, 'me']);
             Route::post('/logout', [AuthController::class, 'logout']);
             Route::post('/refresh', [AuthController::class, 'refresh']);
         });
 
-        // کالاها
+        // --- کالاها ---
         Route::prefix('products')->group(function () {
             Route::middleware('permission:products.view')->group(function () {
                 Route::get('/', [ProductController::class, 'index']);
@@ -41,7 +49,7 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:products.delete')->delete('/{product}', [ProductController::class, 'destroy']);
         });
 
-        // انبارها
+        // --- انبارها ---
         Route::prefix('warehouses')->group(function () {
             Route::middleware('permission:warehouses.view')->group(function () {
                 Route::get('/', [WarehouseController::class, 'index']);
@@ -55,7 +63,7 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:warehouses.delete')->delete('/{warehouse}', [WarehouseController::class, 'destroy']);
         });
 
-        // اشخاص
+        // --- اشخاص ---
         Route::prefix('parties')->group(function () {
             Route::middleware('permission:parties.view')->group(function () {
                 Route::get('/', [PartyController::class, 'index']);
@@ -69,7 +77,7 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:parties.delete')->delete('/{party}', [PartyController::class, 'destroy']);
         });
 
-        // دسته‌بندی کالا
+        // --- دسته‌بندی کالا ---
         Route::prefix('product-categories')->group(function () {
             Route::middleware('permission:products.view')->group(function () {
                 Route::get('/', [ProductCategoryController::class, 'index']);
@@ -83,7 +91,7 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:products.delete')->delete('/{product_category}', [ProductCategoryController::class, 'destroy']);
         });
 
-        // واحدها
+        // --- واحدها ---
         Route::prefix('units')->group(function () {
             Route::middleware('permission:products.view')->group(function () {
                 Route::get('/', [UnitController::class, 'index']);
@@ -97,7 +105,7 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:products.delete')->delete('/{unit}', [UnitController::class, 'destroy']);
         });
 
-        // انبارداری
+        // --- انبارداری ---
         Route::prefix('inventory')->group(function () {
             Route::middleware('permission:inventory.view')->group(function () {
                 Route::get('/stock', [InventoryController::class, 'stockList']);
@@ -113,7 +121,7 @@ Route::prefix('v1')->group(function () {
             });
         });
 
-        // حسابداری
+        // --- حسابداری ---
         Route::prefix('accounting')->group(function () {
             Route::middleware('permission:accounting.view')->group(function () {
                 Route::get('/accounts', [AccountController::class, 'index']);
@@ -134,73 +142,91 @@ Route::prefix('v1')->group(function () {
             Route::middleware('permission:accounting.delete')->delete('/journal-entries/{journalEntry}', [JournalEntryController::class, 'destroy']);
         });
 
-        // ============ 🆕 فاکتورها ============
+        // --- فاکتورها ---
         Route::prefix('invoices')->group(function () {
             Route::middleware('permission:invoices.view')->group(function () {
                 Route::get('/', [InvoiceController::class, 'index']);
                 Route::get('/{invoice}', [InvoiceController::class, 'show']);
             });
-
             Route::middleware('permission:invoices.create')->group(function () {
                 Route::post('/', [InvoiceController::class, 'store']);
                 Route::post('/{invoice}/confirm', [InvoiceController::class, 'confirm']);
                 Route::post('/{invoice}/cancel', [InvoiceController::class, 'cancel']);
             });
-
             Route::middleware('permission:invoices.edit')->delete('/{invoice}', [InvoiceController::class, 'destroy']);
         });
 
-        // گزارش‌ها
+        // --- گزارش‌ها ---
         Route::prefix('reports')->middleware('permission:reports.view')->group(function () {
             Route::get('/trial-balance', [ReportController::class, 'trialBalance']);
             Route::get('/balance-sheet', [ReportController::class, 'balanceSheet']);
             Route::get('/income-statement', [ReportController::class, 'incomeStatement']);
         });
 
-
-        // ============ سامانه مودیان ============
+        // --- سامانه مودیان ---
         Route::prefix('tax')->group(function () {
             Route::middleware('permission:invoices.view')->group(function () {
-                Route::get('/invoices/{invoice}/status', [\App\Http\Controllers\Api\V1\TaxController::class, 'queryStatus']);
-                Route::get('/invoices/{invoice}/preview', [\App\Http\Controllers\Api\V1\TaxController::class, 'previewPayload']);
+                Route::get('/invoices/{invoice}/status', [TaxController::class, 'queryStatus']);
+                Route::get('/invoices/{invoice}/preview', [TaxController::class, 'previewPayload']);
             });
-
-            Route::middleware('permission:invoices.create')->group(function () {
-                Route::post('/invoices/{invoice}/send', [\App\Http\Controllers\Api\V1\TaxController::class, 'sendInvoice']);
-            });
+            Route::middleware('permission:invoices.create')->post('/invoices/{invoice}/send', [TaxController::class, 'sendInvoice']);
         });
 
-
-        // ============ SDUI (Theme) ============
+        // --- SDUI Theme ---
         Route::prefix('theme')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Api\V1\ThemeController::class, 'show']);
-            Route::get('/version', [\App\Http\Controllers\Api\V1\ThemeController::class, 'version']);
+            Route::get('/', [ThemeController::class, 'show']);
+            Route::get('/version', [ThemeController::class, 'version']);
             Route::middleware('role:admin')->group(function () {
-                Route::put('/', [\App\Http\Controllers\Api\V1\ThemeController::class, 'update']);
-                Route::patch('/', [\App\Http\Controllers\Api\V1\ThemeController::class, 'update']);
-                Route::post('/reset', [\App\Http\Controllers\Api\V1\ThemeController::class, 'reset']);
+                Route::put('/', [ThemeController::class, 'update']);
+                Route::patch('/', [ThemeController::class, 'update']);
+                Route::post('/reset', [ThemeController::class, 'reset']);
             });
         });
 
-
-        // ============ Sync Engine ============
+        // --- Sync Engine ---
         Route::prefix('sync')->group(function () {
-            Route::post('/register', [\App\Http\Controllers\Api\V1\SyncController::class, 'register']);
-            Route::post('/pull', [\App\Http\Controllers\Api\V1\SyncController::class, 'pull']);
-            Route::post('/push', [\App\Http\Controllers\Api\V1\SyncController::class, 'push']);
-            Route::get('/status', [\App\Http\Controllers\Api\V1\SyncController::class, 'status']);
+            Route::post('/register', [SyncController::class, 'register']);
+            Route::post('/pull', [SyncController::class, 'pull']);
+            Route::post('/push', [SyncController::class, 'push']);
+            Route::get('/status', [SyncController::class, 'status']);
         });
 
-        // نقشه انبار
-        Route::middleware(['platform:windows', 'role:admin'])->prefix('warehouse-map')->group(function () {
-            Route::post('/layouts', fn () => response()->json(['message' => 'Sprint بعدی']));
-            Route::put('/layouts/{id}', fn () => response()->json(['message' => 'Sprint بعدی']));
-            Route::post('/layouts/{id}/publish', fn () => response()->json(['message' => 'Sprint بعدی']));
+        // ============ نقشه انبار ============
+        Route::prefix('warehouse-map')->group(function () {
+            // خواندن (همه پلتفرم‌ها)
+            Route::middleware('permission:warehouse_map.view')->group(function () {
+                Route::get('/layouts', [WarehouseLayoutController::class, 'index']);
+                Route::get('/layouts/{layout}', [WarehouseLayoutController::class, 'show']);
+                Route::get('/layouts/{layout}/stats', [WarehouseLayoutController::class, 'stats']);
+                Route::get('/layouts/{layout}/locations', [WarehouseLocationController::class, 'index']);
+                Route::get('/locations/{location}', [WarehouseLocationController::class, 'show']);
+                Route::get('/warehouses/{warehouse}/published', [WarehouseLayoutController::class, 'published']);
+            });
+
+            // نوشتن (فقط ویندوز و admin/warehouse_designer)
+            Route::middleware(['platform:windows', 'role:admin,warehouse_designer'])->group(function () {
+                Route::middleware('permission:warehouse_map.create')->post('/layouts', [WarehouseLayoutController::class, 'store']);
+                Route::middleware('permission:warehouse_map.edit')->group(function () {
+                    Route::put('/layouts/{layout}', [WarehouseLayoutController::class, 'update']);
+                    Route::patch('/layouts/{layout}', [WarehouseLayoutController::class, 'update']);
+                    Route::post('/layouts/{layout}/publish', [WarehouseLayoutController::class, 'publish']);
+                    Route::post('/layouts/{layout}/clone', [WarehouseLayoutController::class, 'clone']);
+
+                    Route::post('/layouts/{layout}/locations', [WarehouseLocationController::class, 'store']);
+                    Route::post('/layouts/{layout}/locations/bulk', [WarehouseLocationController::class, 'bulkStore']);
+                    Route::put('/locations/{location}', [WarehouseLocationController::class, 'update']);
+                    Route::patch('/locations/{location}', [WarehouseLocationController::class, 'update']);
+                });
+                Route::middleware('permission:warehouse_map.delete')->group(function () {
+                    Route::delete('/layouts/{layout}', [WarehouseLayoutController::class, 'destroy']);
+                    Route::delete('/locations/{location}', [WarehouseLocationController::class, 'destroy']);
+                });
+            });
         });
-        Route::get('/warehouse-map/layouts/{id}', fn () => response()->json(['message' => 'مشاهده نقشه']));
     });
 });
 
+// ============ سلامت ============
 Route::get('/health', fn () => response()->json([
     'status' => 'ok',
     'timestamp' => now()->toIso8601String(),
