@@ -49,7 +49,7 @@ class InventoryService
                 'average_cost' => round($newAvg, 4),
             ]);
 
-            return InventoryTransaction::create([
+            $transaction = InventoryTransaction::create([
                 'tenant_id' => $tenantId,
                 'warehouse_id' => $warehouseId,
                 'product_id' => $productId,
@@ -64,6 +64,16 @@ class InventoryService
                 'created_by' => $userId ?? auth('api')->id(),
                 'transaction_date' => now(),
             ]);
+
+            event(new \App\Events\StockChanged(
+                tenantId: $tenantId,
+                productId: $productId,
+                warehouseId: $warehouseId,
+                newQuantity: $newQty,
+                action: 'in'
+            ));
+
+            return $transaction;
         });
     }
 
@@ -108,7 +118,7 @@ class InventoryService
                 // average_cost تغییر نمی‌کند
             ]);
 
-            return InventoryTransaction::create([
+            $transaction = InventoryTransaction::create([
                 'tenant_id' => $tenantId,
                 'warehouse_id' => $warehouseId,
                 'product_id' => $productId,
@@ -123,6 +133,16 @@ class InventoryService
                 'created_by' => $userId ?? auth('api')->id(),
                 'transaction_date' => now(),
             ]);
+
+            event(new \App\Events\StockChanged(
+                tenantId: $tenantId,
+                productId: $productId,
+                warehouseId: $warehouseId,
+                newQuantity: $newQty,
+                action: 'out'
+            ));
+
+            return $transaction;
         });
     }
 

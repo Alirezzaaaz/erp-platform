@@ -191,6 +191,12 @@ Route::prefix('v1')->group(function () {
             Route::get('/status', [SyncController::class, 'status']);
         });
 
+        // ============ Broadcasting ============
+        Route::prefix('broadcast')->group(function () {
+            Route::get('/channels', [\App\Http\Controllers\Api\V1\BroadcastController::class, 'channels']);
+            Route::post('/test', [\App\Http\Controllers\Api\V1\BroadcastController::class, 'test']);
+        });
+
         // ============ نقشه انبار ============
         Route::prefix('warehouse-map')->group(function () {
             // خواندن (همه پلتفرم‌ها)

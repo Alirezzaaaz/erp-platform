@@ -88,8 +88,11 @@ class InvoiceService
             }
 
             $invoice->recalculateTotals();
+            $invoice = $invoice->fresh(['items.product', 'party']);
 
-            return $invoice->fresh(['items.product', 'party']);
+            event(new \App\Events\InvoiceCreated($invoice));
+
+            return $invoice;
         });
     }
 
@@ -170,8 +173,11 @@ class InvoiceService
 
             // ۴. تایید فاکتور
             $invoice->update(['status' => 'confirmed']);
+            $invoice = $invoice->fresh(['items.product', 'party']);
 
-            return $invoice->fresh(['items.product', 'party']);
+            event(new \App\Events\InvoiceConfirmed($invoice));
+
+            return $invoice;
         });
     }
 
