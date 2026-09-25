@@ -1,0 +1,65 @@
+name: Build Windows Desktop
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'desktop/**'
+      - 'packages/**'
+      - '.github/workflows/build-windows.yml'
+  workflow_dispatch:  # اجرای دستی
+
+jobs:
+  build-windows:
+    name: Build Windows (.exe)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Windows desktop
+        run: flutter config --enable-windows-desktop
+
+      - name: Get shared_ui dependencies
+        working-directory: ./packages/shared_ui
+        run: flutter pub get
+
+      - name: Get desktop dependencies
+        working-directory: ./desktop
+        run: flutter pub get
+
+      - name: Analyze
+        working-directory: ./desktop
+        run: flutter analyze
+        continue-on-error: true
+
+      - name: Build Windows Release
+        working-directory: ./desktop
+        run: flutter build windows --release
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: erp-desktop-windows-${{ github.sha }}
+          path: desktop/build/windows/x64/runner/Release/
+          retention-days: 30
+
+      - name: Zip Artifact (Alternative)
+        shell: pwsh
+        run: |
+          Compress-Archive -Path desktop/build/windows/x64/runner/Release/* -DestinationPath erp-desktop-windows.zip
+
+      - name: Upload Zip
+        uses: actions/upload-artifact@v4
+        with:
+          name: erp-desktop-zip
+          path: erp-desktop-windows.zip
+          retention-days: 30

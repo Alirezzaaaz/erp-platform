@@ -1,16 +1,53 @@
+# ========== Laravel ==========
 backend/vendor/
 backend/node_modules/
 backend/.env
+backend/.env.backup
+backend/.phpunit.result.cache
 backend/storage/*.key
 backend/storage/logs/*.log
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
 backend/bootstrap/cache/*.php
+backend/public/storage
+
+# ========== Flutter ==========
 **/build/
 **/.dart_tool/
 **/.flutter-plugins
+**/.flutter-plugins-dependencies
 **/.packages
+**/.pub-cache/
+**/.pub/
+**/flutter_export_environment.sh
+**/.flutter-devtools/
+**/pubspec.lock.bak
+
+# ========== Flutter Platform Specific ==========
+**/linux/flutter/ephemeral/
+**/windows/flutter/ephemeral/
+**/macos/Flutter/ephemeral/
+
+# ========== IDE ==========
 .idea/
 .vscode/
 *.swp
+*.swo
+*~
+*.iml
+
+# ========== OS ==========
 .DS_Store
 Thumbs.db
+
+# ========== Docker ==========
 postgres_data/
+
+# ========== Logs ==========
+*.log
+
+# ========== Env ==========
+.env
+.env.local
+.env.*.local
