@@ -4,6 +4,9 @@ import 'package:shared_ui/shared_ui.dart';
 import '../widgets/app_sidebar.dart';
 import 'dashboard_screen.dart';
 import 'products_screen.dart';
+import 'inventory_screen.dart';
+import 'parties_screen.dart';
+import 'invoices_screen.dart';
 import 'placeholder_screen.dart';
 
 class HomeShell extends StatefulWidget {
@@ -104,11 +107,11 @@ class _HomeShellState extends State<HomeShell> {
       case 'products':
         return const ProductsScreen();
       case 'inventory':
-        return const PlaceholderScreen(title: 'انبار', icon: Icons.warehouse_outlined);
+        return const InventoryScreen();
       case 'invoices':
-        return const PlaceholderScreen(title: 'فاکتورها', icon: Icons.receipt_long_outlined);
+        return const InvoicesScreen();
       case 'parties':
-        return const PlaceholderScreen(title: 'اشخاص', icon: Icons.people_outline);
+        return const PartiesScreen();
       case 'accounting':
         return const PlaceholderScreen(title: 'حسابداری', icon: Icons.account_balance_wallet_outlined);
       case 'reports':
