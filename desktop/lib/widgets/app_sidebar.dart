@@ -122,6 +122,9 @@ class AppSidebar extends StatelessWidget {
       case 'warehouse':
       case 'inventory':
         return Icons.warehouse_outlined;
+      case 'map':
+      case 'warehouse_map':
+        return Icons.map_outlined;
       case 'file-text':
       case 'invoices':
         return Icons.receipt_long_outlined;

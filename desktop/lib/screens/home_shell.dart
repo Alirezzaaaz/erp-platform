@@ -8,6 +8,7 @@ import 'inventory_screen.dart';
 import 'parties_screen.dart';
 import 'invoices_screen.dart';
 import 'accounting_screen.dart';
+import 'warehouse_map/layouts_list_screen.dart';
 import 'placeholder_screen.dart';
 
 class HomeShell extends StatefulWidget {
@@ -109,6 +110,8 @@ class _HomeShellState extends State<HomeShell> {
         return const ProductsScreen();
       case 'inventory':
         return const InventoryScreen();
+      case 'warehouse_map':
+        return const LayoutsListScreen();
       case 'invoices':
         return const InvoicesScreen();
       case 'parties':
@@ -129,6 +132,7 @@ class _HomeShellState extends State<HomeShell> {
       case 'dashboard': return 'داشبورد';
       case 'products': return 'کالاها';
       case 'inventory': return 'انبار';
+      case 'warehouse_map': return 'طراح نقشه انبار';
       case 'invoices': return 'فاکتورها';
       case 'parties': return 'اشخاص';
       case 'accounting': return 'حسابداری';
