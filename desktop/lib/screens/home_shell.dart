@@ -7,6 +7,7 @@ import 'products_screen.dart';
 import 'inventory_screen.dart';
 import 'parties_screen.dart';
 import 'invoices_screen.dart';
+import 'accounting_screen.dart';
 import 'placeholder_screen.dart';
 
 class HomeShell extends StatefulWidget {
@@ -113,7 +114,7 @@ class _HomeShellState extends State<HomeShell> {
       case 'parties':
         return const PartiesScreen();
       case 'accounting':
-        return const PlaceholderScreen(title: 'حسابداری', icon: Icons.account_balance_wallet_outlined);
+        return const AccountingScreen();
       case 'reports':
         return const PlaceholderScreen(title: 'گزارش‌ها', icon: Icons.bar_chart_outlined);
       case 'settings':
