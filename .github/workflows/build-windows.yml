@@ -7,7 +7,7 @@ on:
       - 'desktop/**'
       - 'packages/**'
       - '.github/workflows/build-windows.yml'
-  workflow_dispatch:  # اجرای دستی
+  workflow_dispatch:
 
 jobs:
   build-windows:
@@ -21,7 +21,6 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.0'
           channel: 'stable'
           cache: true
 
@@ -45,14 +44,7 @@ jobs:
         working-directory: ./desktop
         run: flutter build windows --release
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: erp-desktop-windows-${{ github.sha }}
-          path: desktop/build/windows/x64/runner/Release/
-          retention-days: 30
-
-      - name: Zip Artifact (Alternative)
+      - name: Zip Artifact
         shell: pwsh
         run: |
           Compress-Archive -Path desktop/build/windows/x64/runner/Release/* -DestinationPath erp-desktop-windows.zip
@@ -60,6 +52,6 @@ jobs:
       - name: Upload Zip
         uses: actions/upload-artifact@v4
         with:
-          name: erp-desktop-zip
+          name: erp-desktop-windows
           path: erp-desktop-windows.zip
           retention-days: 30
