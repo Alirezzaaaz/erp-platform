@@ -1,0 +1,50 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'mobile/**'
+      - 'packages/**'
+      - '.github/workflows/build-android.yml'
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Get shared_ui dependencies
+        working-directory: ./packages/shared_ui
+        run: flutter pub get
+
+      - name: Get mobile dependencies
+        working-directory: ./mobile
+        run: flutter pub get
+
+      - name: Build APK
+        working-directory: ./mobile
+        run: flutter build apk --release --dart-define=API_BASE_URL=https://overstock-stroller-mandatory.ngrok-free.dev/api
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: erp-mobile-apk
+          path: mobile/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
